@@ -1,5 +1,5 @@
 import express from 'express'
-import { authentication, authenticationV2 } from '~/auth/authUtils'
+import { authenticationV2 } from '~/auth/authUtils'
 import accessController from '~/controllers/access.controller'
 import asyncHandler from '~/helpers/asyncHandler'
 
