@@ -1,6 +1,7 @@
 import { Types } from 'mongoose'
 import { BadRequestError } from '~/middlewares/error.response'
 import { product, clothing, electronic } from '~/models/product.model'
+import { inventoryRepo } from '~/models/repo/inventory.repo'
 import { productRepo } from '~/models/repo/product.repo'
 import { removeUndefinedObject, updateNestedObjectParser } from '~/utils'
 
@@ -104,10 +105,20 @@ class Product {
   }
 
   async createProduct(productId: string | Types.ObjectId) {
-    return await product.create({
+    const newProduct = await product.create({
       ...this,
       _id: productId
     })
+
+    if (newProduct) {
+      await inventoryRepo.insertInventory({
+        productId: newProduct._id,
+        shopId: new Types.ObjectId(this.product_shop),
+        stock: this.product_quantity
+      })
+    }
+
+    return newProduct
   }
 
   async updateProduct(productId: string | Types.ObjectId, payload: ProductType) {
