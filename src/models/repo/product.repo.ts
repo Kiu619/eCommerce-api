@@ -19,7 +19,7 @@ const findAllPublishedForShop = async ({ query, limit, skip }: { query: any, lim
 }
 
 const searchProductByUser = async ({ keySearch }: { keySearch: string }) => {
-  const regexSearch = new RegExp(keySearch).source;
+  const regexSearch = new RegExp(keySearch).source
   const result = await product.find(
     {
       isPublished: true,
