@@ -4,6 +4,7 @@ import { product, clothing, electronic } from '~/models/product.model'
 import { inventoryRepo } from '~/models/repo/inventory.repo'
 import { productRepo } from '~/models/repo/product.repo'
 import { removeUndefinedObject, updateNestedObjectParser } from '~/utils'
+import NotificationService from './notification.service'
 
 interface ProductType {
   product_name: string
@@ -117,6 +118,17 @@ class Product {
         stock: this.product_quantity
       })
     }
+
+    // push notification to system
+    await NotificationService.pushNotificationToSystem({
+      type: 'SHOP-001',
+      receiverId: '1',
+      senderId: this.product_shop,
+      options: {
+        product_name: this.product_name,
+        shop_name: this.product_shop
+      }
+    })  
 
     return newProduct
   }
