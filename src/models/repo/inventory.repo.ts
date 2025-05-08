@@ -20,6 +20,27 @@ const insertInventory = async ({
   })
 }
 
+// trừ đi số đạt hàng ở trong kho
+const reservationInventory = async ({ productId, quantity, cartId }: { productId: string, quantity: number, cartId: string }) => {
+  const query = {
+    inven_productId: new Types.ObjectId(productId),
+    inven_stock: { $gte: quantity },
+  }, updateSet = {
+    $inc: {
+      inven_stock: -quantity,
+    },
+    $push: {
+      inven_reservations: {
+        quantity,
+        cartId,
+        createAt: new Date(),
+      }
+    }
+  }, options = { new: true, upsert: true }
+
+  return await inventoryModel.updateOne(query, updateSet, options)
+}
+
 export const inventoryRepo = {
-  insertInventory
+  insertInventory, reservationInventory
 }
