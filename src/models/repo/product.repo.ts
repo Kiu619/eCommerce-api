@@ -1,6 +1,7 @@
 import { Types, SortOrder } from "mongoose"
 import { product, electronic, clothing } from "../product.model"
 import { getSelectData, unGetSelectData } from "~/utils"
+import { NotFoundError } from "~/middlewares/error.response"
 
 const queryProduct = async ({ query, limit, skip }: { query: any, limit: number, skip: number }) => {
   return await product.find(query)
@@ -94,6 +95,25 @@ const unpublishProductByShop = async ({ product_shop, product_id }: { product_sh
   return modifiedCount
 }
 
+const getProductById = async (productId: string) => {
+  return await product.findById(productId)
+}
+
+const checkProductByServer = async (products: any[]) => {
+  return await Promise.all(products.map(async (p) => {
+    const foundProduct = await getProductById(p.productId)
+    if (!foundProduct) {
+      throw new NotFoundError('Product not found')
+    }
+
+    return  {
+      price: foundProduct.product_price,
+      quantity: p.quantity,
+      productId: p.productId,
+    }
+  }))
+}
+
 export const productRepo = {
   findAllDraftsForShop,
   findAllPublishedForShop,
@@ -102,5 +122,7 @@ export const productRepo = {
   searchProductByUser,
   findAllProducts,
   findProduct,
-  updateProductById
+  updateProductById,
+  getProductById,
+  checkProductByServer,
 }
